@@ -1,4 +1,4 @@
-from product import Product, product_id
+from product import Product
 import product
 
 class Inventory:

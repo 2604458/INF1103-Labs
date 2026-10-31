@@ -5,7 +5,7 @@ from product import Product
 from inventory import Inventory
 import product
 
-FILENAME = "inventory_OOP.json"
+FILENAME = "inventory.json"
 
 #for file handling
 def create_default_inventory() -> Inventory:
@@ -27,8 +27,8 @@ def load_inventory() -> Inventory:
             inventory = Inventory()
             for item in data:
                 inventory.add_product(
-                    Product(item["product_id"], item["name"], item["price"], item["quantity"])
-                )
+                    Product(item["id"], item["name"], item["price"], item["stock"])
+            )
                 
             print("=" * 40)
             print("INVENTORY MANAGEMENT SYSTEM")
@@ -36,9 +36,11 @@ def load_inventory() -> Inventory:
             print("\nInventory.json found.")
             print("Inventory loaded successfully.")
             return inventory
-    except (json.JSONDecodeError, KeyError, TypeError):
-            print("Error reading JSON file. Starting with default inventory.")
-            return create_default_inventory()
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        import traceback
+        traceback.print_exc()
+        print(f"Error reading JSON file ({type(e).__name__}: {e}). Starting with default inventory.")
+        return create_default_inventory()
 
 def save_inventory(inventory: Inventory) -> None:
     data = [
