@@ -1,6 +1,8 @@
-class Product:
+from abc import ABC, abstractmethod
 
-#represents and maanges a single product
+class Product(ABC):
+
+#abstract base class representing a product 
 
     def __init__(self, product_id: str, name: str, price: float, stock: int) -> None:
         self.__product_id = product_id
@@ -40,6 +42,50 @@ class Product:
             f"Stock: {self.__stock}")
         print("-" * 40)
 
+    @abstractmethod
+    def get_fulfilment_info(self) -> str:
+        #abstract method forcing subclasses to define how the product is fulfilled (e.g., shipped or downloaded)
+        pass
+
     def __str__(self) -> str:
         #oneline summary, used when listing all products
         return f"ID: {self.__product_id}, Name: {self.__name}, Price: ${self.__price:.2f}, Stock: {self.__stock}"
+
+class PhysicalProduct(Product):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float) -> None:
+        super().__init__(product_id, name, price, stock)
+        self.__weight = weight
+
+    @property
+    def weight(self) -> float:
+        return self.__weight
+
+    #Method overriding with super() usage
+    def display_information(self) -> None:
+        super().display_information()
+        print(f"Weight: {self.__weight} kg")
+        print( f"Fulfilment: {self.get_fulfilment_info()}")
+        print("-" * 40)
+
+    def get_fulfilment_info(self) -> str:
+        return "requires physical shipping and handling."
+
+class DigitalProduct(Product):
+    def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float) -> None:
+        #Resuse paraent constructor using super()
+        super().__init__(product_id, name, price, stock)
+        self.__download_size = download_size
+
+    @property
+    def download_size(self) -> float:
+        return self.__download_size
+
+    #Method overriding with super() usage
+    def display_information(self) -> None:
+        super().display_information()
+        print(f"Download Size: {self.__download_size} MB")
+        print(f"Fulfilment: {self.get_fulfilment_info()}")
+        print("-" * 40)
+
+    def get_fulfilment_info(self) -> str:
+        return "Delivered digitally via download link."
