@@ -1,20 +1,20 @@
 import json
 import os
 
-from product import Product
+from product import PhysicalProduct, Product, DigitalProduct
 from inventory import Inventory
-import product
 
 FILENAME = "inventory.json"
 
 #for file handling
 def create_default_inventory() -> Inventory:
     inventory = Inventory()
-    inventory.add_product(Product("P001", "Laptop", 1000.00, 15))
-    inventory.add_product(Product("P002", "Mouse", 25.50, 40))
-    inventory.add_product(Product("P003", "Keyboard", 45.00, 25))
+    inventory.add_product(PhysicalProduct("P001", "Laptop", 1000.00, 15, 2.5))
+    inventory.add_product(PhysicalProduct("P002", "Mouse", 25.50, 40, 0.2))
+    inventory.add_product(DigitalProduct("P003", "Antivirus Software", 45.00, 25, 350.0))
     return inventory
 
+#updated load logic to instantiate appropriate subclasses
 def load_inventory() -> Inventory:
     if not os.path.exists(FILENAME):
         print(f"File '{FILENAME}' not found. Creating default inventory.")
@@ -26,9 +26,19 @@ def load_inventory() -> Inventory:
 
             inventory = Inventory()
             for item in data:
-                inventory.add_product(
-                    Product(item["id"], item["name"], item["price"], item["stock"])
-            )
+                product_type = item.get("type")
+                if product_type == "physical":
+                    prod = PhysicalProduct(
+                        item["id"], item["name"], item["price"], item["stock"], item["weight"]
+                    )
+                elif product_type == "digital":
+                    prod = DigitalProduct(
+                        item["id"], item["name"], item["price"], item["stock"], item["download_size"]
+                    )
+                else:
+                    continue  # Skip unhandled or legacy data types
+                
+                inventory.add_product(prod)
                 
             print("=" * 40)
             print("INVENTORY MANAGEMENT SYSTEM")
@@ -42,23 +52,36 @@ def load_inventory() -> Inventory:
         print(f"Error reading JSON file ({type(e).__name__}: {e}). Starting with default inventory.")
         return create_default_inventory()
 
+#updated save logic to include product type and additional attributes
 def save_inventory(inventory: Inventory) -> None:
-    data = [
-        {
+    data = []
+    for p in inventory.get_products():
+        item_dict = {
             "id": p.product_id,
             "name": p.name,
             "price": p.price,
             "stock": p.stock,
         }
-        for p in inventory.get_products()
-    ]
+        if isinstance(p, PhysicalProduct):
+            item_dict["type"] = "physical"
+            item_dict["weight"] = p.weight
+        elif isinstance(p, DigitalProduct):
+            item_dict["type"] = "digital"
+            item_dict["download_size"] = p.download_size
+            
+        data.append(item_dict)
+
     with open(FILENAME, "w") as file:
         json.dump(data, file, indent=4)
     print("Inventory saved to inventory.json successfully.")
 
-#Menu actions for user input
+#prompt user for product type & type-specific input
 def add_product_menu(inventory: Inventory) -> None:
     print("\nAdd new product:")
+    print("1. Physical Product")
+    print("2. Digital Product")
+    type_choice = input("Select product type (1 or 2): ")
+
     product_id = input("Enter product ID: ")
     name = input("Enter product name: ")
     try:
@@ -70,7 +93,28 @@ def add_product_menu(inventory: Inventory) -> None:
         print("Invalid price or stock. Product not added.")
         return
 
-    product = Product(product_id, name, price, stock)
+    if type_choice == "1":
+        try:
+            weight = float(input("Enter product weight (kg): "))
+            if weight < 0:
+                raise ValueError
+            product = PhysicalProduct(product_id, name, price, stock, weight)
+        except ValueError:
+            print("Invalid weight. Product not added.")
+            return
+    elif type_choice == "2":
+        try:
+            download_size = float(input("Enter download size (MB): "))
+            if download_size < 0:
+                raise ValueError
+            product = DigitalProduct(product_id, name, price, stock, download_size)
+        except ValueError:
+            print("Invalid download size. Product not added.")
+            return
+    else:
+        print("Invalid product type choice. Product not added.")
+        return
+
     if inventory.add_product(product):
         print("Product added successfully!")
     else:
