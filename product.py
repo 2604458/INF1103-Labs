@@ -1,5 +1,11 @@
 from abc import ABC, abstractmethod
 
+class CanBeShipped(ABC):
+    @abstractmethod
+    def calculate_shipping_cost(self) -> float:
+        #abstract method to calculate shipping cost for products that can be shipped
+        pass
+
 class Product(ABC):
 
 #abstract base class representing a product 
@@ -40,7 +46,7 @@ class Product(ABC):
             f"Name: {self.__name}\n"
             f"Price: ${self.__price:.2f}\n"
             f"Stock: {self.__stock}")
-        print("-" * 40)
+
 
     @abstractmethod
     def get_fulfilment_info(self) -> str:
@@ -51,7 +57,7 @@ class Product(ABC):
         #oneline summary, used when listing all products
         return f"ID: {self.__product_id}, Name: {self.__name}, Price: ${self.__price:.2f}, Stock: {self.__stock}"
 
-class PhysicalProduct(Product):
+class PhysicalProduct(Product, CanBeShipped):
     def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float) -> None:
         super().__init__(product_id, name, price, stock)
         self.__weight = weight
@@ -65,11 +71,17 @@ class PhysicalProduct(Product):
         super().display_information()
         print(f"Weight: {self.__weight} kg")
         print( f"Fulfilment: {self.get_fulfilment_info()}")
+        print(f"Shipping Cost: ${self.calculate_shipping_cost():.2f}")
         print("-" * 40)
 
     def get_fulfilment_info(self) -> str:
         return "requires physical shipping and handling."
 
+    def calculate_shipping_cost(self) -> float:
+        # Example shipping cost calculation (can be modified based on actual requirements)
+        return 5.00 + (self.__weight * 2.00)  # Base cost + $2 per kg
+    
+    
 class DigitalProduct(Product):
     def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float) -> None:
         #Resuse paraent constructor using super()
