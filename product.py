@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from supplier import Supplier
+
 class CanBeShipped(ABC):
     @abstractmethod
     def calculate_shipping_cost(self) -> float:
@@ -10,11 +12,12 @@ class Product(ABC):
 
 #abstract base class representing a product 
 
-    def __init__(self, product_id: str, name: str, price: float, stock: int) -> None:
-        self.__product_id = product_id
-        self.__name = name
-        self.__price = price
-        self.__stock = stock
+    def __init__(self, product_id: str, name: str, price: float, stock: int, supplier: Supplier) -> None:
+        self.__product_id: str= product_id
+        self.__name: str = name
+        self.__price: float = price
+        self.__stock: int = stock
+        self.__supplier: Supplier = supplier
 
 #read only accesss to the private attributes so main.py can access them but not modify them directly.
     @property
@@ -32,6 +35,10 @@ class Product(ABC):
     @property
     def stock(self) -> int:
         return self.__stock
+
+    @property
+    def supplier(self) -> Supplier:
+        return self.__supplier
 
     def update_stock(self, quantity: int) -> None:
         #update the stock quantity of the product to a new quantity and cannot be negative.
@@ -58,9 +65,9 @@ class Product(ABC):
         return f"ID: {self.__product_id}, Name: {self.__name}, Price: ${self.__price:.2f}, Stock: {self.__stock}"
 
 class PhysicalProduct(Product, CanBeShipped):
-    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float) -> None:
-        super().__init__(product_id, name, price, stock)
-        self.__weight = weight
+    def __init__(self, product_id: str, name: str, price: float, stock: int, weight: float, supplier: Supplier) -> None:
+        super().__init__(product_id, name, price, stock, supplier)
+        self.__weight: float = weight
 
     @property
     def weight(self) -> float:
@@ -83,10 +90,10 @@ class PhysicalProduct(Product, CanBeShipped):
     
     
 class DigitalProduct(Product):
-    def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float) -> None:
+    def __init__(self, product_id: str, name: str, price: float, stock: int, download_size: float, supplier: Supplier) -> None:
         #Resuse paraent constructor using super()
-        super().__init__(product_id, name, price, stock)
-        self.__download_size = download_size
+        super().__init__(product_id, name, price, stock, supplier)
+        self.__download_size: float = download_size
 
     @property
     def download_size(self) -> float:
