@@ -25,7 +25,7 @@ class Inventory:
         print("\nCurrent Inventory:")
         print("-" * 40)
         for product in self.__products:
-            print(product)
+            product.display_information()
         print("-" * 40)
 
     def get_products(self) -> list[Product]:
