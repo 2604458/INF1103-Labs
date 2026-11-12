@@ -4,11 +4,11 @@ class Inventory:
     #managers a collection of Product objects
 
     def __init__(self) -> None:
-        self.__products = list[Product] = []
+        self.__products : list[Product] = []
 
     def add_product(self, product: Product) -> bool:
         #Add a Product. Returns false if the ID already exists.
-        if self.search_product(product.product_id) is not None:
+        if self.find_product(product.product_id) is not None:
             return False
         self.__products.append(product)
         return True
