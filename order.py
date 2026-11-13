@@ -18,8 +18,8 @@ class OrderLine:
         return self.__product.price * self.__quantity
 
     def display_information(self) -> None:
-        print(f"{self.__product.name} x {self.__quantity}"
-              f"@ ${self.__product.price: .2f} = ${self.calculate_subtotal(): .2f}")
+        print(f"{self.__product.name} x {self.__quantity} "
+              f"@ ${self.__product.price:.2f} = ${self.calculate_subtotal():.2f}")
 
 class Order:
     # A customer order made up of OrderLines (composition).

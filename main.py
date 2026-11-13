@@ -64,8 +64,6 @@ def load_inventory(suppliers: dict[str, Supplier]) -> Inventory:
             print("Inventory loaded successfully.")
             return inventory
     except (json.JSONDecodeError, KeyError, TypeError) as e:
-        import traceback
-        traceback.print_exc()
         print(f"Error reading JSON file ({type(e).__name__}: {e}). Starting with default inventory.")
         return create_default_inventory(suppliers)
 

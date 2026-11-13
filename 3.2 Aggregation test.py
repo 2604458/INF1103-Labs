@@ -1,3 +1,4 @@
+# Lab 8 - Section 3.2: Aggregation test (Inventory <>-- Product)
 from supplier import Supplier
 from product import PhysicalProduct
 from inventory import Inventory
